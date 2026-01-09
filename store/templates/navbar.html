@@ -477,7 +477,6 @@
 
         .all-categories-btn:hover {
             background-color: #ffffff;
-            color: #4f46e5; /* Highlight color */
         }
 
         /* --- UPDATED Mega Menu Container --- */
@@ -492,7 +491,7 @@
             z-index: 2000; /* Super high z-index to float over everything */
             
             /* Sizing */
-            width: 900px; /* Fixed width for the dropdown menu */
+            width: 1000px; /* Fixed width for the dropdown menu */
             max-width: 90vw; /* Responsive constraint */
             
             /* Your Original Styles preserved below: */
@@ -698,10 +697,10 @@
             </div>
 
             <div class="mega-menu-container">
-                {% for category in categories %}
+                {% for category in categories|slice:":8" %}
                 <a href="{% url 'category' category.name %}" class="menu-item">
                     <div class="icon-box">
-                        <i class="{{ category.icon_class }}"></i>
+                        <i class="{{ category.icon_url }}"></i>
                     </div>
                     <div class="text-box">
                         <h3>{{ category.name }}</h3>

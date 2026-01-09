@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - DhakaMart{% endblock %}
+
+{% block content %}
+
+        <!-- Header-->
+        <header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">Order shipped</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">Welcome to DhakaMart, your one-stop shop for all your needs. We are committed to providing high-quality products at competitive prices.</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- <div class="container my-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="fw-bold text-dark mb-0">Shipped Items</h3>
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3">Total Orders: {{ orders|length }}</span>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4 py-3 text-uppercase fs-xs fw-bold text-muted" style="font-size: 0.75rem;">Order ID</th>
+                                <th class="py-3 text-uppercase fs-xs fw-bold text-muted" style="font-size: 0.75rem;">Price</th>
+                                <th class="py-3 text-uppercase fs-xs fw-bold text-muted" style="font-size: 0.75rem;">Customer</th>
+                                <th class="pe-4 py-3 text-uppercase fs-xs fw-bold text-muted text-end" style="font-size: 0.75rem;">Date Ordered</th>
+                                <th class="pe-4 py-3 text-uppercase fs-xs fw-bold text-muted" style="font-size: 0.75rem;">Shipped</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in orders %}
+                            <tr>
+                                <td class="ps-4 fw-medium text-primary"><a href="{% url 'orders' item.id %}">#{{ item.id }}</td>
+                                <td class="fw-bold">${{ item.amount_paid }}</td>
+                                <td>
+                                    <div class="text-dark">{{ item.email }}</div>
+                                </td>
+                                <td class="pe-4 text-end text-muted small">
+                                    {{ item.date_ordered }}
+                                </td>
+                                <td>
+                                    <input type="hidden" name="shipping_status" value="true">
+                                    <button type="submit" class="btn btn-sm px-2 py-1 shadow-sm text-white text-nowrap" style="background-color: #c92f2f;">
+
+                                        Mark as <span class="fw-bold">NOT</span> Shipped
+                                    </button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div> -->
+        <div class="container my-5">
+            <div class="d-flex align-items-center justify-content-between mb-4">
+                <h3 class="fw-bold text-dark mb-0">Shipped Items</h3>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-2">
+                    Total Orders: {{ orders|length }}
+                </span>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light border-bottom">
+                            <tr>
+                                <th class="ps-4 py-3 text-uppercase text-secondary small fw-bold" style="letter-spacing: 0.5px;">Order ID</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold" style="letter-spacing: 0.5px;">Price</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold" style="letter-spacing: 0.5px;">Customer</th>
+                                <th class="py-3 text-uppercase text-secondary small fw-bold text-end" style="letter-spacing: 0.5px;">Date Ordered</th>
+                                <th class="pe-4 py-3 text-uppercase text-secondary small fw-bold text-end" style="letter-spacing: 0.5px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in orders %}
+                            <tr>
+                                <td class="ps-4">
+                                    <a href="{% url 'orders' item.id %}" class="fw-bold text-decoration-none text-primary">
+                                        #{{ item.id }}
+                                    </a>
+                                </td>
+                                
+                                <td class="fw-bold text-dark">
+                                    ${{ item.amount_paid }}
+                                </td>
+                                
+                                <td>
+                                    <span class="d-block text-dark fw-medium">{{ item.email }}</span>
+                                </td>
+                                
+                                <td class="text-end text-muted small">
+                                    {{ item.date_ordered|date:"M d, Y" }}
+                                </td>
+                                
+                                <td class="pe-4 text-end">
+                                    <form method="POST" action=""> {% csrf_token %}
+                                        <input type="hidden" name="shipping_status" value="false ">
+                                        <input type="hidden" name="order_id" value="{{ item.id }}">
+                                        
+                                        <button type="submit" class="btn btn-sm btn-outline-danger px-3 shadow-sm fw-medium border-opacity-25">
+                                            Mark Unshipped
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" class="text-center py-5 text-muted">
+                                    <div class="mb-2">📦</div>
+                                    <span class="small">No shipped items found.</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+{% endblock %}

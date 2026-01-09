@@ -1,0 +1,431 @@
+    {% comment %}  
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            
+            <div class="container px-4 px-lg-5">
+
+                <a class="navbar-brand" href="{% url 'home' %}">DhakaMart</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+
+                        <li class="nav-item"><a class="btn btn-light {% if request.path == '/' %}active{% endif %}" aria-current="page" href="{% url 'home' %}">Home</a></li>
+                        <li class="nav-item"><a class="btn btn-light {% if request.path == '/about/' %}active{% endif %}" href="{% url 'about' %}">About</a></li>
+                        <li class="nav-item"><a class="btn btn-light {% if request.path == '/contact_us/' %}active{% endif %}" href="{% url 'contact_us' %}">Contact Us</a></li>
+                        <li class="nav-item dropdown btn-light {% if request.path == '/category_summary/' or request.path|slice:'0:10' == '/category/' %} active {% endif %}">
+                            <a class="btn btn-light dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Categories</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'category_summary' %}">All Products</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+                                {% for category in categories %}
+                                <li><a class="dropdown-item" href="{% url 'category' category.name %}">{{ category.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <!-- <li class="nav-item"><a class="nav-link {% if request.path == '/update/' %}active{% endif %}" href="{% url 'update_user' %}">Profile</a></li> -->
+                        <li class="nav-item dropdown {% if request.path == '/update/' or request.path == '/update_info/' %} active {% endif %}">
+                            <a class="btn btn-light dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Profile</a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" href="{% url 'update_user' %}">Update Profile</a></li>
+                                <li><a class="dropdown-item" href="{% url 'update_info' %}">Update Info</a></li>
+                            </ul>
+                        </li>
+                        {% if user.is_superuser %}
+                            <li class="nav-item dropdown">
+                                <a class="btn btn-light dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Orders</a>
+                                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <li><a class="dropdown-item" href="{% url 'shipped_dash' %}">Shipped Orders</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'not_shipped_dash' %}">Un-Shipped Orders</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        <li>
+                            <a href="{% url 'search' %}" class="btn btn-light search-btn {% if request.path == '/search/' %} active {% endif %}">
+                                <i class="fas fa-search"></i>
+                            </a>
+                        </li>
+                    </ul>
+
+                        
+
+                    <form class="d-flex">
+                        <a href="{% url 'cart_summary' %}" type="submit"  class="btn btn-light {% if request.path == '/cart/' %} active {% endif %}">
+                            <i class="bi-cart-fill me-1"></i>
+                            Cart
+                            <span class="badge bg-dark text-white ms-1 rounded-pill" id="cart_quantity">{{ cart|length }}</span>
+                        </a>
+                    </form>
+
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'logout' %}" class="btn btn-light ms-2">
+                        <i class="bi-person-fill me-1"></i>
+                        Logout
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-light {% if request.path == '/login/' %} active {% endif %}">
+                        <i class="bi-person-fill me-1"></i>
+                        Login
+                    </a>
+
+                    <a href="{% url 'register' %}" class="btn btn-light {% if request.path == '/register/' %} active {% endif %}">
+                        <i class="bi-person-fill me-1"></i>
+                        Register
+                    </a>
+
+                    {% endif %}
+                    
+                </div>
+            </div>
+    </nav>
+
+    {% endcomment %} 
+
+    {% block extra_head %}
+        <style>
+        /* CSS Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Navbar Container */
+        /* .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: white;
+            padding: 5px 10px;
+            border-bottom: 1px solid #e0e0e0;
+            min-width: 1000px; /* Ensures layout mimics desktop view */
+        /* } */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #798086;
+            border-bottom: 1px solid #798086;
+            width: 100%;
+
+            /* Sticky Positioning */
+            position: sticky;
+            top: 0;
+            z-index: 1000; /* Keeps navbar above text/images while scrolling */
+
+            /* Default Padding (Mobile) */
+            padding: 10px 15px;
+        }
+        
+        .navbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Keeps Logo left, Actions right */
+            width: 100%;
+        }
+
+        /* Larger Padding for Desktop */
+        @media (min-width: 768px) {
+            .navbar {
+                padding: 10px 35px;
+            }
+        }
+
+        /* Logo Section */
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-right: 3rem;
+            cursor: pointer;
+        }
+
+        .logo a{
+            text-decoration: none;
+            color: #ffffff;
+        }
+        
+        .logo a:hover {
+            color: #000000;
+        }
+
+        /* --- NEW AMAZON STYLE SEARCH BAR --- */
+        /* Your existing container */
+        .search-container {
+            display: flex;
+            flex-grow: 1;
+            max-width: 800px;
+            height: 40px;
+            border-radius: 4px; /* Rounded corners for the whole box */
+            overflow: hidden;
+            margin-right: 20px;
+            border: 1px solid #ccc; /* Optional: Adds a border around the whole thing */
+            background-color: white; /* Ensures background is white */
+        }
+
+        /* NEW: Make the form take up all space inside the container */
+        .search-container form {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* NEW: Strip default Bootstrap styling so it fits seamlessly */
+        .search-container .form-control {
+            border: none;       /* Remove individual border */
+            border-radius: 0;   /* Remove individual roundness */
+            height: 100%;       /* Fill the 40px height */
+            box-shadow: none;   /* Remove blue glow on click */
+        }
+
+        /* NEW: adjust button to fit */
+        .search-container .search-button {
+            height: 100%;
+            border: none;
+            border-radius: 0;
+            background-color: #febd69; /* Amazon orange (optional, remove if unwanted) */
+        }
+        /* The "All" Dropdown (Left side) */
+        
+
+        /* The Text Input (Middle) */
+        .search-input {
+            flex-grow: 1;
+            border: 1px solid #cdcdcd;
+            border-right: none; /* Merges with the button */
+            padding: 0 10px;
+            font-size: 15px;
+            color: #111;
+            outline: none;
+        }
+
+        .search-input:focus {
+            /* Simulating the focus ring */
+            box-shadow: inset 0 0 0 2px #e77600; 
+            z-index: 10;
+        }
+
+        /* The Search Button (Right side) */
+        .search-button {
+            background-color: #febd69; /* Amazon Yellow/Orange */
+            border: 1px solid #febd69; /* Matches background */
+            width: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-top-right-radius: 4px;
+            border-bottom-right-radius: 4px;
+        }
+
+        .search-button:hover {
+            background-color: #f3a847; /* Slightly darker on hover */
+        }
+
+        /* --- END SEARCH BAR --- */
+
+        /* Right Side Actions Section */
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        /* Specific Item Styling */
+        .action-item {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            color: #333;
+            font-size: 1rem;
+        }
+
+        .action-item a {
+            text-decoration: none;
+            color: inherit; /* Inherits color from parent */
+        }
+
+        .action-item span {
+            margin-left: 5px;
+        }
+
+        .action-item span:hover {
+            color: inherit;   /* Change this hex code to your preferred blue */
+            cursor: pointer;  /* Shows the hand icon to indicate it's clickable */
+        }
+
+        .action-item:hover {
+            color: #ffffff;   /* Change this hex code to your preferred blue */
+            cursor: pointer;  /* Shows the hand icon to indicate it's clickable */
+        }
+
+        /* 2. Target the SVG icon inside it to ensure it also turns blue */
+        .action-item:hover svg {
+            fill: #ffffff;    /* Matches the text color */
+        }
+
+        /* Optional: Add a smooth transition to the base class */
+        .action-item {
+            transition: color 0.3s ease;
+        }
+        .action-item svg {
+            transition: fill 0.3s ease;
+        }
+
+        .action-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .cart-icon {
+            width: 30px;  /* Increase this to make it bigger */
+            height: 30px; /* Keep height same as width */
+            
+            /* Optional: If it looks too high/low after resizing */
+            position: relative;
+            top: -2px; 
+        }
+
+        .small-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .main-label {
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Icon Styles */
+        .icon-svg {
+            width: 24px;
+            height: 24px;
+            fill: #333;
+        }
+
+        /* Special styling for Flag Icon */
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+            display: inline-block;
+            background-color: #006a4e; /* Bangladesh Green */
+            position: relative;
+        }
+        .flag-icon::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background-color: #f42a41; /* Bangladesh Red */
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Buttons */
+        .create-acc-btn {
+            background-color: #798086;
+            color: black;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .create-acc-btn:hover {
+            background-color: #ffffff;
+        }
+
+        .create-acc-btn a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .product-card {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px); /* Moves the card up 5px */
+            box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important; /* Makes shadow deeper */
+        }
+        
+
+        </style>
+    {% endblock extra_head %}
+
+    <nav class="navbar">
+        <div class="container px-4 px-lg-5 navbar-content">
+        <div class="logo"><a href="{% url 'home' %}">Oporup</a></div>
+
+        <div class="search-container">
+            <form class="d-flex w-100" method="POST" action="{% url 'search' %}">
+                {% csrf_token %}
+                
+                <input 
+                    class="form-control" 
+                    type="search" 
+                    placeholder="Search" 
+                    aria-label="Search" 
+                    name="searched"
+                    style="flex-grow: 1;" 
+                >
+                <button class="btn search-button" type="submit">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </form>
+        </div>
+
+        <div class="nav-actions">
+
+            <div class="action-item">
+                
+                <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 5px;">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                </svg>
+                <a href="{% url 'login' %}">Sign in</a>
+                
+            </div>
+
+            <a href="{% url 'register' %}"><button class="create-acc-btn">Create account</button></a>
+
+
+            <div class="action-item">
+                <a href="{% url 'cart_summary' %}" class="btn position-relative" style="border: none;">
+                    
+                    <svg class="icon-svg cart-icon" width="24" height="24" viewBox="0 0 24 24">
+                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"></path>
+                    </svg>
+
+                    <!-- <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-dark" style="top: 5px !important; left: 35px !important;" id="cart_quantity">
+                        {{ cart|length }}
+                        <span class="visually-hidden">items in cart</span>
+                    </span> -->
+                    
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-white text-dark" 
+                        style="top: 5px !important; left: 35px !important; background-color: white !important; color: #212529 !important; text-decoration: none !important;" 
+                        id="cart_quantity">
+                        {{ cart|length }}
+                        <span class="visually-hidden">items in cart</span>
+                    </span>
+
+                </a>
+            </div>
+        </div>
+        </div>
+    </nav>

@@ -1,0 +1,14 @@
+.env/
+db.sqlite3
+__pycache__/
+*.pyc
+media/
+staticfiles/
+.DS_Store
+.vscode/
+*.log
+.idea/
+*.sqlite3
+*.pot
+*.mo
+node_modules/

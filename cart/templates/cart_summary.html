@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - DhakaMart{% endblock %}
+
+{% block content %}
+
+        <!-- Header-->
+        <header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">Shopping Cart</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">View your cart items</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Section-->
+                <div class="container my-5">
+                    {% if cart_products %}
+                    <ul class="list-unstyled">
+                        {% for product in cart_products %}
+                        <li class="d-flex align-items-center border-bottom py-3">
+                            <div class="me-4">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" 
+                                        alt="{{ product.name }}" 
+                                        class="img-thumbnail" 
+                                        style="width: 150px; height: 150px; object-fit: cover;">
+                                {% else %}
+                                    <div class="img-thumbnail d-flex align-items-center justify-content-center" style="width: 150px; height: 150px; background: #f8f9fa;">
+                                        No Image
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h5 class="mb-0">{{ product.name }}</h5>
+                                <small class="text-muted">{{ product.description|truncatewords:20 }}</small>
+                            </div>
+
+                            
+                            <div class="row align-items-start g-3">
+
+                                <div class="col-auto d-flex flex-column h-100">
+                                    <div class="d-flex flex-column">
+                                        <span class="text-muted small text-center">Quantity</span>
+                                        
+                                        <select class="form-select mt-1" id="select{{ product.id }}" style="min-width: 80px;">
+                                            <option selected>
+                                                {% for key, value in quantities.items %}
+                                                    {% if key == product.id|slugify %}
+                                                        {{ value }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            </option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                            <option value="6">6</option>
+                                            <option value="7">7</option>
+                                            <option value="8">8</option>
+                                            <option value="9">9</option>
+                                            <option value="10">10</option>
+                                        </select>
+                                    </div>
+
+                                    <button type="button" data-index="{{ product.id }}" class="btn btn-secondary update-cart mt-auto">
+                                        Update
+                                    </button>
+
+                                    <button type="button" data-index="{{ product.id }}" class="btn btn-danger delete-cart mt-auto">
+                                        Remove
+                                    </button>
+
+                                </div>
+
+
+                                <div class="col-auto ms-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="d-flex flex-column">
+                                        <span class="text-muted small text-center">Price</span>
+                                        {% if product.on_sale %}
+                                            <del><span class="fw-bold text-center strike-through">${{ product.price }}</span></del>
+                                            <span class="fw-bold text-center">${{ product.sale_price }}</span>
+                                        {% else %}
+                                            <span class="fw-bold text-center">${{ product.price }}</span>
+                                        {% endif %}
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </li>
+                        {% endfor %}
+
+                        <div class="container">
+                            <div class="row justify-content-end">
+                                <div class="col-md-3"> <div class="border p-3 rounded d-flex justify-content-center align-items-center">
+                                        <h3 class="m-0">Total: ${{ totals }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <a href="{% url 'checkout' %}" class="btn btn-success float-end">Checkout</a>
+                            </div>
+                        </div>
+                        
+                        
+
+                    </ul>
+
+                    {% else %}
+                    <p>Your cart is empty.</p>
+
+                    {% endif %}
+                </div>
+
+<script>
+    // Update cart item
+    $(document).on('click','.update-cart',function(e){
+        e.preventDefault();
+        // grab the product id
+        var product_id = $(this).data('index');
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_update' %}",
+            data: {
+                product_id: $(this).data('index'),
+                product_qty: $('#select'+ product_id + ' option:selected').text(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post',
+            },
+            success: function(json){
+                // console.log(json);
+                // document.getElementById('cart_quantity').textContent = json.qty;
+                location.reload();
+            },
+
+            error: function(xhr, errmsg, err){
+                // console.log(xhr.status + ": " + xhr.responseText);
+            }
+        })
+    });
+    // Delete cart item
+    $(document).on('click','.delete-cart',function(e){
+        e.preventDefault();
+        // grab the product id
+        //var product_id = $(this).data('index');
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_remove' %}",
+            data: {
+                product_id: $(this).data('index'),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post',
+            },
+            success: function(json){
+                // console.log(json);
+                // document.getElementById('cart_quantity').textContent = json.qty;
+                location.reload();
+            },
+
+            error: function(xhr, errmsg, err){
+                // console.log(xhr.status + ": " + xhr.responseText);
+            }
+        })
+    });
+</script> 
+
+{% endblock %}

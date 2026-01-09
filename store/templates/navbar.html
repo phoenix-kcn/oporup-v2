@@ -361,8 +361,94 @@
             transform: translateY(-5px); /* Moves the card up 5px */
             box-shadow: 0 1rem 3rem rgba(0,0,0,.175) !important; /* Makes shadow deeper */
         }
-        
 
+        /* 1. Container */
+        .profile-dropdown-container {
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            /* Ensure the container isn't taller than necessary to keep relative positioning tight */
+            height: auto; 
+        }
+
+        /* 2. The Dropdown Box */
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            
+            /* POSITIONING FIX: */
+            top: 100%; /* Starts right below the text */
+            right: 0;  /* Aligns the right edge of the box with the right edge of the Profile section */
+            
+            /* Push it down to clear the navbar padding (Adjust this number if needed) */
+            margin-top: 20px; 
+            
+            width: 220px; /* Slightly wider for better readability */
+            background-color: #ffffff;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Deeper shadow for "floating" effect */
+            border-radius: 8px;
+            padding: 8px 0;
+            z-index: 1000;
+            border: 1px solid #f0f0f0;
+
+            /* Animation */
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.2s ease-in-out;
+        }
+
+        /* 3. Invisible Bridge (Crucial) */
+        /* This creates a transparent block between the text and the menu so the mouse doesn't "lose" the hover when moving down */
+        .dropdown-menu::before {
+            content: "";
+            position: absolute;
+            top: -20px; /* Must match the margin-top value above */
+            left: 0;
+            width: 100%;
+            height: 20px; /* Must match the margin-top value above */
+            background: transparent;
+        }
+
+        /* 4. Show Dropdown on Hover */
+        .profile-dropdown-container:hover .dropdown-menu {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 5. Dropdown Items */
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: #444;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+            color: #000;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: #e9ecef;
+            margin: 4px 0;
+        }
+
+        .dropdown-item.text-danger {
+            color: #dc3545;
+        }
+
+        .dropdown-item.text-danger:hover {
+            background-color: #fff5f5;
+        }
+        
         </style>
     {% endblock extra_head %}
 
@@ -395,16 +481,43 @@
 
             {% if user.is_authenticated %}
 
-                <div class="action-item">
+                <!-- <div class="action-item">
                     
                     <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 5px;">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
                     </svg>
-                    <a href="{% url 'login' %}"><b>Profile</b></a>
+                    <b>Profile</b>
                     
+                </div> -->
+
+                <div class="action-item profile-dropdown-container">
+    
+                    <div class="profile-trigger">
+                        <svg class="icon-svg" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
+                        </svg>
+                        <b>Profile</b>
+                    </div>
+
+                    <div class="dropdown-menu">
+                        <a href="#" class="dropdown-item">
+                            <i class="bi bi-person-gear"></i> Update Profile
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="bi bi-credit-card"></i> Update Billing
+                        </a>
+                        <a href="#" class="dropdown-item">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item text-danger">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                    </div>
+
                 </div>
 
-                <a href="{% url 'register' %}"><button class="create-acc-btn">Become a seller</button></a>
+            <a href="#"><button class="create-acc-btn">Become a seller</button></a>
 
             
             {% else %}
@@ -413,7 +526,7 @@
                     <svg class="icon-svg" viewBox="0 0 24 24" style="margin-right: 5px;">
                         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path>
                     </svg>
-                    <a href="{% url 'login' %}"><b>Sign in</b></a>
+                    <a href="{% url 'login' %}"><b>Sign in</b></a> 
                     
                 </div>
 

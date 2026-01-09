@@ -700,7 +700,11 @@
                 {% for category in categories|slice:":8" %}
                 <a href="{% url 'category' category.name %}" class="menu-item">
                     <div class="icon-box">
-                        <i class="{{ category.icon_url }}"></i>
+                        {% if category.icon_img %}
+                            <img src="{{ category.icon_img.url }}" alt="{{ category.name }}" class="custom-icon">
+                        {% else %}
+                            <i class="fa-solid fa-layer-group"></i>
+                        {% endif %}
                     </div>
                     <div class="text-box">
                         <h3>{{ category.name }}</h3>

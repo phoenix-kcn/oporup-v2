@@ -4,12 +4,36 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from imagekit.models import ImageSpecField 
 from imagekit.processors import ResizeToFill
+from PIL import Image
 
 
 # Category Model
 class  Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    icon_img = models.ImageField(upload_to='uploads/category_icons/', blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        # 1. Save the instance first so the file is created on the filesystem
+        super().save(*args, **kwargs)
+
+        # 2. Open the image if it exists
+        if self.icon_img:
+            img_path = self.icon_img.path
+
+            try:
+                img = Image.open(img_path)
+
+                # 3. Define the maximum size (e.g., 100x100 pixels for an icon)
+                output_size = (50, 50)
+
+                # 4. Resize if the image is larger than the output size
+                if img.height > 50 or img.width > 50:
+                    img.thumbnail(output_size)
+                    img.save(img_path) # Overwrite the file with the smaller version
+            except Exception as e:
+                # Handle cases where the file might not be a valid image
+                print(f"Error resizing image: {e}")
 
     def __str__(self):
         return self.name

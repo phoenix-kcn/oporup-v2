@@ -134,11 +134,7 @@ def category_summary(request):
     categories = Category.objects.all()
     return render(request, 'category_summary.html', {'categories': categories})
 
-
-def contact_us(request):
-    return render(request, 'contact_us.html', {})
-
-
+    
 def update_user(request):
     if request.user.is_authenticated:
         current_user = User.objects.get(id=request.user.id)

@@ -481,34 +481,25 @@
 
         /* --- UPDATED Mega Menu Container --- */
         .mega-menu-container {
-            /* HIDE IT BY DEFAULT */
-            display: none; 
-            
-            /* Absolute Positioning logic */
+            display: none; /* Hidden by default */
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 15px;
             position: absolute;
-            top: 100%; /* Push it exactly below the sub-navbar */
+            top: 100%;
             left: 0;
-            z-index: 2000; /* Super high z-index to float over everything */
-            
-            /* Sizing */
-            width: 1000px; /* Fixed width for the dropdown menu */
-            max-width: 90vw; /* Responsive constraint */
-            
-            /* Your Original Styles preserved below: */
-            /* grid-template-columns will be applied on hover */
-            gap: 16px;
+            z-index: 2000;
+            width: 1000px;
+            max-width: 90vw;
             padding: 20px;
             background-color: #ffffff;
             border: 1px solid #e5e7eb;
-            border-radius: 0 0 8px 8px; /* Round bottom corners only */
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
-
         /* --- THE HOVER MAGIC --- */
         /* When hovering the wrapper, find the menu and turn it into a GRID */
         .category-dropdown-wrapper:hover .mega-menu-container {
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            display: grid;
             animation: fadeIn 0.2s ease-in-out;
         }
 
@@ -521,67 +512,85 @@
         /* --- Existing Menu Item Styles (No changes needed here) --- */
         .menu-item {
             display: flex;
-            align-items: flex-start;
-            gap: 15px;
+            flex-direction: column; /* Stack text vertically */
+            justify-content: center; /* Center vertically */
+            align-items: center;     /* Center horizontally */
+            text-align: center;      /* Center text alignment */
+            
+            height: 160px;           /* REQUIRED: Give the card a fixed height */
             padding: 16px;
             text-decoration: none;
-            color: inherit;
-            background-color: #f9fafb;
             border-radius: 8px;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease-in-out;
             border: 1px solid transparent;
+
+            /* Background Image Handling */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            /* Fallback color if image fails */
+            background-color: #374151; 
         }
 
         .menu-item:hover {
-            background-color: #ffffff;
-            border-color: #3b82f6;
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .icon-box {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 40px;
-            height: 40px;
-            background-color: #e0e7ff;
-            color: #4f46e5;
-            border-radius: 8px;
-            font-size: 1.2rem;
-        }
-
-        .menu-item:hover .icon-box {
-            background-color: #4f46e5;
-            color: #ffffff;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            /* We do NOT want to change background-color to white here, 
+            or we lose the image. We just zoom. */
         }
 
         .text-box h3 {
-            margin: 0 0 4px 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: #1f2937;
+            margin: 0 0 6px 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: #ffffff; /* WHITE TEXT */
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7); /* Shadow for readability */
         }
 
         .text-box p {
             margin: 0;
             font-size: 13px;
-            color: #6b7280;
+            color: #f3f4f6; /* Off-white text */
+            text-shadow: 0 1px 3px rgba(0,0,0,0.7);
             line-height: 1.4;
         }
 
-        .view-all-btn {
+        /* --- THE 'VIEW ALL' BUTTON EXCEPTION --- */
+        /* This restores the 'View All' button to look like a normal button 
+        instead of an image card */
+        .menu-item.view-all-btn {
+            background-image: none !important; /* Force remove background image */
             background-color: #eff6ff;
             border: 1px dashed #3b82f6;
+            height: 160px; /* Keep height consistent */
         }
 
-        .view-all-btn:hover {
+        .menu-item.view-all-btn:hover {
             background-color: #dbeafe;
         }
 
-        .view-all-btn h3 {
+        .menu-item.view-all-btn h3 {
+            color: #2563eb; /* Blue text */
+            text-shadow: none;
+        }
+
+        .menu-item.view-all-btn p {
+            color: #6b7280; /* Grey text */
+            text-shadow: none;
+        }
+
+        .menu-item.view-all-btn .icon-box {
+            margin-bottom: 10px;
+            font-size: 24px;
             color: #2563eb;
         }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         </style>
     {% endblock extra_head %}
 
@@ -698,14 +707,11 @@
 
             <div class="mega-menu-container">
                 {% for category in categories|slice:":8" %}
-                <a href="{% url 'category' category.name %}" class="menu-item">
-                    <div class="icon-box">
-                        {% if category.icon_img %}
-                            <img src="{{ category.icon_img.url }}" alt="{{ category.name }}" class="custom-icon">
-                        {% else %}
-                            <i class="fa-solid fa-layer-group"></i>
-                        {% endif %}
-                    </div>
+                <a href="{% url 'category' category.name %}" 
+                class="menu-item" 
+                style="background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('{% if category.icon_img %}{{ category.icon_img.url }}{% else %}https://placehold.co/300x300?text=No+Img{% endif %}');">
+                    
                     <div class="text-box">
                         <h3>{{ category.name }}</h3>
                         <p>{{ category.description|truncatechars:50 }}</p>

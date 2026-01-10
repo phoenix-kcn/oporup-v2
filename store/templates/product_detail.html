@@ -1,37 +1,108 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{{ product.name }} - DhakaMart{% endblock %}
+{% block title %}{{ product.name }} - Details{% endblock %}
 
 {% block extra_head %}
     <meta name="description" content="{{ product.description }}">
     <meta name="keywords" content="{{ product.name }}, DhakaMart, {{ product.category.name }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        :root {
+            --primary-color: #ff6819; /* Your brand orange */
+            --text-dark: #1a1a1a;
+            --text-muted: #6c757d;
+            --border-color: #e9ecef;
+        }
 
+        /* Gallery Styles */
+        .product-gallery-sticky {
+            position: sticky;
+            top: 20px;
+        }
+        .main-image-container {
+            border-radius: 8px;
+            overflow: hidden;
+            background: #f8f9fa;
+            cursor: crosshair; /* Hints at zoom */
+            margin-bottom: 1rem;
+        }
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .thumbnail-img {
+            width: 100%;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .thumbnail-img:hover, .thumbnail-img.active {
+            border-color: var(--primary-color);
+        }
+
+        /* Variant Selectors */
+        .variant-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .btn-check:checked + .btn-outline-dark {
+            background-color: #1a1a1a;
+            color: white;
+        }
+        
+        /* Quantity Input */
+        .qty-input-group {
+            width: 140px;
+        }
+        .qty-input-group input {
+            text-align: center;
+            border-left: 0;
+            border-right: 0;
+        }
+
+        /* Actions */
+        .btn-primary-custom {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-weight: 600;
+            transition: transform 0.1s;
+        }
+        .btn-primary-custom:hover {
+            background-color: #e55a10;
+            transform: translateY(-1px);
+            color: white;
+        }
+        .trust-badge-item {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .product-gallery-sticky { position: static; }
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
 
-<div class="container my-5">
+<!-- <div class="container my-5">
     <div class="card p-3 shadow-sm border-0">
         <div class="row">
             <div class="col-md-5 mb-4 mb-md-0">
                 <div class="border d-flex justify-content-center align-items-center p-3 mb-2" style="height: 350px; background-color: #f8f8f8;">
                     <img src="{{ product.image.url }}" class="img-fluid" alt="Screen Expander" style="max-height: 100%;">
                 </div>
-
-                <!-- <div class="d-flex align-items-center justify-content-between">
-                    <button class="btn btn-sm text-secondary me-2">&lt;</button>
-                    <div class="border p-1 me-2" style="width: 60px; height: 60px; border-color: #ff6819!important; border-width: 2px !important;">
-                         <img src="thumbnail1.png" class="img-fluid" alt="Thumbnail">
-                    </div>
-                    <div class="border p-1 me-2" style="width: 60px; height: 60px;">
-                        <img src="thumbnail2.png" class="img-fluid" alt="Thumbnail">
-                    </div>
-                    <div class="border p-1 me-2" style="width: 60px; height: 60px;">
-                        <img src="thumbnail3.png" class="img-fluid" alt="Thumbnail">
-                    </div>
-                    <button class="btn btn-sm text-secondary">&gt;</button>
-                </div> -->
             </div>
             
             <div class="col-md-7">
@@ -123,6 +194,230 @@
             }
         })
     });
+</script> -->
+
+
+<div class="container my-5">
+    
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Home</a></li>
+            <li class="breadcrumb-item"><a href="#" class="text-decoration-none text-muted">Category</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row gx-5">
+        <div class="col-lg-6 mb-5 mb-lg-0">
+            <div class="product-gallery-sticky">
+                                <div class="main-image-container position-relative ratio ratio-1x1">
+                    <img id="mainImage" src="{{ product.image.url }}" class="img-fluid object-fit-contain p-4" alt="{{ product.name }}">
+                    {% if product.on_sale %}
+                        <span class="position-absolute top-0 start-0 m-3 badge bg-danger rounded-pill px-3 py-2">-{{ product.discount_percentage }}%</span>
+                    {% endif %}
+                </div>
+
+                <div class="thumbnail-grid">
+                    <img src="{{ product.image.url }}" class="thumbnail-img active" onclick="changeImage(this)">
+                    <img src="{{ product.image.url }}" class="thumbnail-img" style="filter: hue-rotate(90deg);" onclick="changeImage(this)">
+                    <img src="{{ product.image.url }}" class="thumbnail-img" style="filter: hue-rotate(180deg);" onclick="changeImage(this)">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="ps-lg-3">
+                
+                <h6 class="text-uppercase text-muted fw-bold mb-2">
+                    <a href="#" class="text-decoration-none text-muted">No Brand</a>
+                </h6>
+                <h1 class="display-6 fw-bold text-dark mb-2">{{ product.name }}</h1>
+
+                <div class="d-flex align-items-center mb-4">
+                    <div class="text-warning me-2">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i>
+                    </div>
+                    <span class="text-muted small border-end pe-3 me-3">4.0 (12 Reviews)</span>
+                    <span class="text-success small"><i class="fas fa-check-circle me-1"></i>In Stock</span>
+                </div>
+
+                <div class="mb-4">
+                    <div class="d-flex align-items-end gap-3">
+                        <span class="h2 fw-bold mb-0 text-dark">$ {{ product.price }}</span>
+                        {% if product.on_sale %}
+                            <span class="text-muted text-decoration-line-through mb-1">$ {{ product.original_price }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-muted small mt-1">Tax included. Shipping calculated at checkout.</p>
+                </div>
+
+                <hr class="my-4">
+
+                <p class="text-muted mb-4">{{ product.description|truncatewords:30 }}</p>
+
+                                <div class="mb-4">
+                    <span class="variant-label">Select Size</span>
+                    <div class="d-flex gap-2">
+                        <input type="radio" class="btn-check" name="size" id="size-7" autocomplete="off">
+                        <label class="btn btn-outline-dark px-3 py-2" for="size-7">7</label>
+
+                        <input type="radio" class="btn-check" name="size" id="size-8" autocomplete="off" checked>
+                        <label class="btn btn-outline-dark px-3 py-2" for="size-8">8</label>
+
+                        <input type="radio" class="btn-check" name="size" id="size-9" autocomplete="off">
+                        <label class="btn btn-outline-dark px-3 py-2" for="size-9">9</label>
+                    </div>
+                </div>
+
+                <div class="row g-3 align-items-end mb-4">
+                    <div class="col-auto">
+                        <label class="variant-label">Quantity</label>
+                        <div class="input-group qty-input-group">
+                            <button class="btn btn-outline-secondary" type="button" id="btn-minus">-</button>
+                            <input type="text" class="form-control" id="qty-display" value="1" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="btn-plus">+</button>
+                        </div>
+                        <select id="qty-cart" style="display:none;">
+                            <option value="1" selected>1</option>
+                            </select>
+                    </div>
+
+                    <div class="col">
+                        <button type="button" value="{{ product.id }}" id="add-to-cart" class="btn btn-primary-custom w-100 shadow-sm">
+                            Add to Cart
+                        </button>
+                    </div>
+
+                    <div class="col-auto">
+                        <button class="btn btn-outline-secondary p-2" title="Add to Wishlist">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+
+                                <div class="row g-3 p-3 bg-light rounded-3 mb-4">
+                    <div class="col-6 trust-badge-item">
+                        <i class="fas fa-truck fa-lg text-dark"></i> Free Shipping over $50
+                    </div>
+                    <div class="col-6 trust-badge-item">
+                        <i class="fas fa-undo fa-lg text-dark"></i> 30-Day Returns
+                    </div>
+                    <div class="col-6 trust-badge-item">
+                        <i class="fas fa-shield-alt fa-lg text-dark"></i> 2-Year Warranty
+                    </div>
+                    <div class="col-6 trust-badge-item">
+                        <i class="fas fa-lock fa-lg text-dark"></i> Secure Checkout
+                    </div>
+                </div>
+
+                <div class="accordion accordion-flush" id="productAccordion">
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#descCollapse">
+                                Product Details
+                            </button>
+                        </h2>
+                        <div id="descCollapse" class="accordion-collapse collapse show" data-bs-parent="#productAccordion">
+                            <div class="accordion-body text-muted">
+                                {{ product.description }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="accordion-item">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#shipCollapse">
+                                Shipping & Returns
+                            </button>
+                        </h2>
+                        <div id="shipCollapse" class="accordion-collapse collapse" data-bs-parent="#productAccordion">
+                            <div class="accordion-body text-muted">
+                                Standard delivery: 3-5 working days. Returns accepted within 30 days of purchase.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    
+    <div class="mt-5 pt-5 border-top">
+        <h3 class="mb-4 fw-bold">You might also like</h3>
+        </div>
+</div>
+
+<script>
+    // 1. Image Gallery Logic
+    function changeImage(element) {
+        document.getElementById('mainImage').src = element.src;
+        // Remove active class from all
+        document.querySelectorAll('.thumbnail-img').forEach(el => el.classList.remove('active'));
+        // Add active to clicked
+        element.classList.add('active');
+    }
+
+    // 2. Quantity Logic (Stepper to Hidden Select Sync)
+    const qtyDisplay = document.getElementById('qty-display');
+    const qtySelect = document.getElementById('qty-cart');
+    
+    document.getElementById('btn-plus').addEventListener('click', () => {
+        let val = parseInt(qtyDisplay.value);
+        if(val < 10) {
+            val++;
+            updateQty(val);
+        }
+    });
+
+    document.getElementById('btn-minus').addEventListener('click', () => {
+        let val = parseInt(qtyDisplay.value);
+        if(val > 1) {
+            val--;
+            updateQty(val);
+        }
+    });
+
+    function updateQty(val) {
+        qtyDisplay.value = val;
+        // Update the hidden select required by your AJAX
+        qtySelect.innerHTML = `<option value="${val}" selected>${val}</option>`; 
+    }
+
+    // 3. Existing AJAX Logic (Preserved)
+    $(document).on('click','#add-to-cart',function(e){
+        e.preventDefault();
+        
+        // Optional: Add loading state to button
+        let btn = $(this);
+        let originalText = btn.text();
+        btn.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adding...');
+        btn.prop('disabled', true);
+
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'cart_add' %}",
+            data: {
+                product_id: $('#add-to-cart').val(),
+                product_qty: $('#qty-cart option:selected').text(), // Now reads from our synced hidden select
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post',
+            },
+            success: function(json){
+                document.getElementById('cart_quantity').textContent = json.qty;
+                // Success feedback (Toast or Button change instead of reload for better UX)
+                btn.html('Added!');
+                setTimeout(() => {
+                    location.reload(); // Keeping your reload logic
+                }, 500);
+            },
+            error: function(xhr, errmsg, err){
+                console.log(xhr.status + ": " + xhr.responseText);
+                btn.html(originalText);
+                btn.prop('disabled', false);
+            }
+        })
+    });
 </script>
+
+
 
 {% endblock %}

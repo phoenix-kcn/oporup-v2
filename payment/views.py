@@ -6,6 +6,10 @@ from .models import ShippingAddress, Order, OrderItems
 from django.contrib.auth.models import User
 from store.models import Product, Profile
 import datetime
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+from sslcommerz_lib import SSLCOMMERZ
+
 
 def payment_success(request):
     return render(request, 'payment/payment_success.html', {})
@@ -74,106 +78,140 @@ def process_order(request):
         cart_products = cart.get_products()
         quantities = cart.get_quantities()
         totals = cart.cart_total()
-        # Get billing info from last page
-        payment_form = PaymentForm(request.POST or None)
+        
         # Get shipping Session Data
         my_shipping = request.session.get('my_shipping')
+        if not my_shipping:
+            messages.error(request, "Shipping info missing")
+            return redirect('checkout')
+
         full_name = my_shipping['shipping_full_name']
         email = my_shipping['shipping_email']
-        
-        
-        # Create Shipping Address from session info
         shipping_address = f"{my_shipping['shipping_address1']}\n{my_shipping['shipping_address2']}\n{my_shipping['shipping_city']}\n{my_shipping['shipping_state']}\n{my_shipping['shipping_zipcode']}\n{my_shipping['shipping_country']}"
         amount_paid = totals
 
-        # Let's create an Order
-        if request.user.is_authenticated:
-            # Lets gather user info
-            user = request.user
-            create_order = Order(user=user, full_name=full_name, email=email, shipping_address=shipping_address, amount_paid=amount_paid)
-            create_order.save()
-            
-            # DELETE THE CART FROM THE DATABASE
-            # Adjust this to your actual Profile model location
-            current_user = Profile.objects.filter(user__id=request.user.id)
-            # Clear the old cart data (usually stored as a string or JSON)
-            current_user.update(old_cart="")
-            # Add order items
-            # Get the order ID
-            order_id = create_order.pk
-            
-            # Get product info
-            
-            for product in cart_products:
-                product_id = product.id
-                # Get product price
-                if product.on_sale:
-                    price = product.sale_price
-                else:
-                    price = product.price
-                    
-                # Get quantity
-                for key, value in quantities.items():
-                    if int(key) == product.id:
-                        # value
-                        create_order_item = OrderItems(order_id=order_id, product_id=product_id, user=user, quantity=value, price=price)
-                        create_order_item.save()
-                        
-            # Delete the cart after checkout
-            for key in list(request.session.keys()):
-                if key == 'session_key':
-                    # Delete key
-                    del request.session[key]
-            
-            # DELETE THE CART FROM THE DATABASE
-            current_user = Profile.objects.filter(user__id=request.user.id)
-            # Clear the old cart data (usually stored as a string or JSON)
-            current_user.update(old_cart="")
-            
-            messages.success(request, 'Order Placed!')
-            return redirect('home')
+        # 1. Create the Order (Mark as NOT paid initially)
+        user = request.user if request.user.is_authenticated else None
         
+        create_order = Order(
+            user=user, 
+            full_name=full_name, 
+            email=email, 
+            shipping_address=shipping_address, 
+            amount_paid=amount_paid,
+            paid=False  # Explicitly set to False
+        )
+        create_order.save()
+
+        # 2. Add Order Items
+        order_id = create_order.pk
+        for product in cart_products:
+            product_id = product.id
+            if product.on_sale:
+                price = product.sale_price
+            else:
+                price = product.price
+            
+            for key, value in quantities.items():
+                if int(key) == product.id:
+                    OrderItems.objects.create(
+                        order_id=order_id, 
+                        product_id=product_id, 
+                        user=user, 
+                        quantity=value, 
+                        price=price
+                    )
+
+        # 3. SSLCommerz Configuration
+        sslcz_settings = { 
+            'store_id': settings.SSLCOMMERZ_STORE_ID, 
+            'store_pass': settings.SSLCOMMERZ_STORE_PASS, 
+            'issandbox': settings.SSLCOMMERZ_ISSANDBOX 
+        }
+        sslcz = SSLCOMMERZ(sslcz_settings)
+        
+        # Build the dynamic URLs for callbacks
+        current_host = request.build_absolute_uri('/')[:-1] # gets http://127.0.0.1:8000
+        
+        post_body = {
+            'total_amount': float(totals),
+            'currency': "BDT",
+            'tran_id': f"Ord_{order_id}", # Unique Transaction ID
+            'success_url': f"{current_host}/payment/payment_success_callback/",
+            'fail_url': f"{current_host}/payment/payment_fail/",
+            'cancel_url': f"{current_host}/payment/payment_cancel/",
+            'emi_option': 0,
+            'cus_name': full_name,
+            'cus_email': email,
+            'cus_phone': "01700000000", # Add phone to your shipping form if needed
+            'cus_add1': my_shipping['shipping_address1'],
+            'cus_city': my_shipping['shipping_city'],
+            'cus_country': my_shipping['shipping_country'],
+            'shipping_method': "NO",
+            'multi_card_name': "",
+            'num_of_item': len(cart_products),
+            'product_name': "Goods",
+            'product_category': "General",
+            'product_profile': "general"
+        }
+
+        # 4. Request Session and Redirect
+        response = sslcz.createSession(post_body)
+        
+        if 'GatewayPageURL' in response:
+            return redirect(response['GatewayPageURL'])
         else:
-            # Not logged in
-            create_order = Order(full_name=full_name, email=email, shipping_address=shipping_address, amount_paid=amount_paid)
-            create_order.save()
+            messages.error(request, "Error connecting to Payment Gateway")
+            return redirect('checkout')
             
-            # Add order items
-            # Get the order ID
-            order_id = create_order.pk
-            
-            # Get product info
-            
-            for product in cart_products:
-                product_id = product.id
-                # Get product price
-                if product.on_sale:
-                    price = product.sale_price
-                else:
-                    price = product.price
-
-                # Get quantity
-                for key, value in quantities.items():
-                    if int(key) == product.id:
-                        # value
-                        create_order_item = OrderItems(order_id=order_id, product_id=product_id, quantity=value, price=price)
-                        create_order_item.save()
-
-            # Delete the cart after checkout
-            for key in list(request.session.keys()):
-                if key == 'session_key':
-                    # Delete key
-                    del request.session[key]
-                        
-            messages.success(request, 'Order Placed!')
-            return redirect('home')
-            
-        
-        
     else:
         messages.success(request, 'Access Denied')
         return redirect('home')
+
+@csrf_exempt
+def payment_success_callback(request):
+    if request.method == 'POST' or request.method == 'post':
+        payment_data = request.POST
+        
+        # Extract the transaction ID we sent (e.g., "Ord_55")
+        tran_id = payment_data.get('tran_id')
+        val_id = payment_data.get('val_id') # Bank's validation ID
+        
+        # Parse the Order ID from tran_id
+        try:
+            order_id = int(tran_id.split('_')[1])
+            order = Order.objects.get(id=order_id)
+            
+            # Update Order Status
+            order.paid = True
+            order.transaction_id = val_id # Store the bank reference
+            order.save()
+            
+            # --- START: Clear Cart Logic (Moved from process_order) ---
+            
+            # Clear Session Cart
+            for key in list(request.session.keys()):
+                if key == 'session_key':
+                    del request.session[key]
+            
+            # Clear Database Cart (if user is logged in)
+            if request.user.is_authenticated:
+                current_user = Profile.objects.filter(user__id=request.user.id)
+                current_user.update(old_cart="")
+            
+            # --- END: Clear Cart Logic ---
+
+            return render(request, 'payment/payment_success.html', {'order': order})
+
+        except Order.DoesNotExist:
+            return render(request, 'payment/payment_fail.html', {'message': 'Order not found'})
     
+    return render(request, 'payment/payment_fail.html')
+
+
+@csrf_exempt
+def payment_fail(request):
+    return render(request, 'payment/payment_fail.html')
 
 def shipped_dash(request):
     if request.user.is_authenticated and request.user.is_superuser:

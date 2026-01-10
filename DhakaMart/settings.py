@@ -156,3 +156,9 @@ MEDIA_URL = 'media/'
 # This tells Django: "When you want to show an image, look at this URL"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
+
+# Replace these with your actual Store ID and Password
+SSLCOMMERZ_STORE_ID = 'dhaka6962a78cc899c'
+SSLCOMMERZ_STORE_PASS = 'dhaka6962a78cc899c@ssl'
+SSLCOMMERZ_ISSANDBOX = True  # Set to False for production

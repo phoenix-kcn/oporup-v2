@@ -122,7 +122,7 @@
 {% block content %}
 <div class="checkout-header py-4 mb-5">
     <div class="container text-center">
-        <h2 class="fw-bold mb-1">Billing Info</h2>
+        <h2 class="fw-bold mb-1">Billing</h2>
         <p class="text-muted mb-0">Review your order and proceed to payment</p>
     </div>
 </div>
@@ -144,9 +144,9 @@
                                 <div class="product-meta mt-1">
                                     Price: 
                                     {% if product.on_sale %}
-                                        ${{ product.sale_price }}
+                                        {{ product.sale_price }} tk
                                     {% else %}
-                                        ${{ product.price }}
+                                        {{ product.price }} tk
                                     {% endif %}
                                     &nbsp;|&nbsp;
                                     Qty: 
@@ -159,9 +159,9 @@
                             </div>
                             <div class="fw-bold">
                                 {% if product.on_sale %}
-                                    ${{ product.sale_price }}
+                                    {{ product.sale_price }} tk
                                 {% else %}
-                                    ${{ product.price }}
+                                    {{ product.price }} tk
                                 {% endif %}
                             </div>
                         </div>
@@ -172,7 +172,7 @@
                     <div class="mt-4 pt-3 border-top">
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <span class="text-muted">Total Amount</span>
-                            <span class="total-amount">${{ totals }}</span>
+                            <span class="total-amount">{{ totals }} tk</span>
                         </div>
                         
                         <a href="{% url 'cart_summary' %}" class="btn btn-outline-custom w-100">
@@ -245,7 +245,7 @@
 
                 <div class="text-end">
                     <button type="submit" class="btn btn-primary-custom shadow">
-                        Proceed to Pay ${{ totals }} <i class="fas fa-arrow-right ms-2"></i>
+                        Proceed to Pay {{ totals }} tk<i class="fas fa-arrow-right ms-2"></i>
                     </button>
                     <div class="mt-2 text-muted small">
                         <i class="fas fa-lock me-1"></i> Your transaction is secured with SSL encryption

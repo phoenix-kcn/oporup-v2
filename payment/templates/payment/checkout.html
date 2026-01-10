@@ -1,88 +1,250 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Home - DhakaMart{% endblock %}
+{% block title %}Oporum Checkout{% endblock %}
+
+{% block extra_head %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --chk-primary: #111827;
+            --chk-bg: #F9FAFB;
+            --chk-card-bg: #ffffff;
+            --chk-border: #E5E7EB;
+            --chk-muted: #6B7280;
+            --chk-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.03), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+        }
+
+        .checkout-wrapper {
+            background-color: var(--chk-bg);
+            padding: 60px 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        .modern-card {
+            background: var(--chk-card-bg);
+            border: 1px solid var(--chk-border);
+            border-radius: 12px;
+            box-shadow: var(--chk-shadow);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .card-header-custom {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--chk-border);
+            font-weight: 600;
+            font-size: 1.1rem;
+            background: transparent;
+            color: var(--chk-primary);
+        }
+
+        .card-body-custom {
+            padding: 24px;
+        }
+
+        /* Form Inputs */
+        .form-label-custom {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-control-custom {
+            display: block;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid var(--chk-border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            border-color: var(--chk-primary);
+            box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
+        }
+
+        /* Order Summary Items */
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+        }
+
+        .item-name {
+            font-weight: 500;
+            color: var(--chk-primary);
+        }
+
+        .item-meta {
+            font-size: 0.85rem;
+            color: var(--chk-muted);
+            margin-top: 4px;
+        }
+
+        .total-row {
+            border-top: 1px solid var(--chk-border);
+            margin-top: 20px;
+            padding-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--chk-primary);
+        }
+
+        /* Buttons */
+        .btn-edit-cart {
+            color: var(--chk-muted);
+            font-size: 0.875rem;
+            text-decoration: underline;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .btn-edit-cart:hover { color: var(--chk-primary); }
+
+        .btn-checkout {
+            background-color: var(--chk-primary);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            font-weight: 500;
+            border: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .btn-checkout:hover {
+            opacity: 0.9;
+            color: #fff;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
-
-        <!-- Header-->
-        <header class="bg-dark py-5">
-            <div class="container px-4 px-lg-5 my-5">
-                <div class="text-center text-white">
-                    <h1 class="display-4 fw-bolder">Checkout</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Review your cart ..</p>
-                </div>
-            </div>
-        </header>
-
-        <!-- Section-->
-                <div class="container my-5">
-
-                    <div class="row g-4"> 
+    <div class="checkout-wrapper">
+        <div class="container">
+            
+            <form method="POST" action="{% url 'billing_info' %}">
+                {% csrf_token %}
                 
-                        <div class="col-md-5">
-                            <div class="card shadow-sm">
-                                <div class="card-header">
-                                    Order Summary
-                                </div>
-                                <div class="card-body">
-                                    {% for product in cart_products %}
-                                        <div class="mb-2">
-                                            <strong>{{ product.name }}</strong>
-                                            <br>
-                                            Price: 
-                                            {% if product.on_sale %}
-                                                ${{ product.sale_price }}
-                                            {% else %}
-                                                ${{ product.price }}
-                                            {% endif %}
-                                            <br>
-                                            <span>Quantity: </span>
-                                            {% for key, value in quantities.items %}
-                                                {% if key == product.id|slugify %}
-                                                    {{ value }}
-                                                {% endif %}
-                                            {% endfor %}
+                <div class="row g-5 justify-content-center">
+                    
+                    <div class="col-lg-5 order-lg-1">
+                        <div class="modern-card">
+                            <div class="card-header-custom">
+                                Order Summary
+                            </div>
+                            <div class="card-body-custom">
+                                {% for product in cart_products %}
+                                    <div class="summary-item">
+                                        <div>
+                                            <div class="item-name">{{ product.name }}</div>
+                                            <div class="item-meta">
+                                                Qty: 
+                                                {% for key, value in quantities.items %}
+                                                    {% if key == product.id|slugify %}{{ value }}{% endif %}
+                                                {% endfor %}
+                                            </div>
                                         </div>
-                                        <hr>
-                                    {% empty %}
-                                        <p>Your cart is empty.</p>
-                                    {% endfor %}
-
-                                    <div class="d-flex justify-content-between align-items-center pt-2">
-                                        <a href="{% url 'cart_summary' %}" class="btn btn-outline-secondary btn-sm">
-                                            &larr; Edit Cart
-                                        </a>
                                         <div class="text-end">
-                                            <strong class="h5">Total: ${{ totals }}</strong>
+                                            {% if product.on_sale %}
+                                                {{ product.sale_price }} tk
+                                            {% else %}
+                                                {{ product.price }} tk
+                                            {% endif %}
                                         </div>
+                                    </div>
+                                {% empty %}
+                                    <p class="text-muted">Your cart is empty.</p>
+                                {% endfor %}
+
+                                <div class="total-row">
+                                    <a href="{% url 'cart_summary' %}" class="btn-edit-cart">Edit Cart</a>
+                                    <div class="text-end">
+                                        <div class="text-muted small">Total</div>
+                                        <div class="total-amount">{{ totals }} tk</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+                    <div class="col-lg-7 order-lg-2">
+                        <div class="modern-card">
+                            <div class="card-header-custom">
+                                Shipping Information
+                            </div>
+                            <div class="card-body-custom">
+                                
+                                <div class="mb-4">
+                                    <label class="form-label-custom">Full Name</label>
+                                    <input type="text" name="full_name" class="form-control-custom" placeholder="e.g. John Doe" value="{{ shipping_form.full_name.value|default:'' }}" required>
+                                    <div class="text-danger small">{{ shipping_form.full_name.errors }}</div>
+                                </div>
 
-                        <div class="col-md-7">
-                            <div class="card shadow-sm">
-                                <div class="card-header bg-dark text-white">
-                                    Shipping Info
+                                <div class="mb-4">
+                                    <label class="form-label-custom">Email Address</label>
+                                    <input type="email" name="email" class="form-control-custom" placeholder="john@example.com" value="{{ shipping_form.email.value|default:'' }}" required>
+                                    <div class="text-danger small">{{ shipping_form.email.errors }}</div>
                                 </div>
-                                <div class="card-body">
-                                    <form method="POST" action="{% url 'billing_info' %}">
-                                        {% csrf_token %}
-                                        {{ shipping_form.as_p }}
-                                    
-                                        <div class="d-flex justify-content-end mt-4">
-                                            <button type="submit" class="btn btn-secondary">
-                                                Continue to billing &rarr;
-                                            </button>
-                                        </div>
-                                    </form>
+
+                                <div class="mb-4">
+                                    <label class="form-label-custom">Address Line 1</label>
+                                    <input type="text" name="address1" class="form-control-custom" placeholder="Street address" value="{{ shipping_form.address1.value|default:'' }}" required>
+                                    <div class="text-danger small">{{ shipping_form.address1.errors }}</div>
                                 </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label-custom">Address Line 2 (Optional)</label>
+                                    <input type="text" name="address2" class="form-control-custom" placeholder="Apartment, suite, etc." value="{{ shipping_form.address2.value|default:'' }}">
+                                </div>
+
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">City</label>
+                                        <input type="text" name="city" class="form-control-custom" value="{{ shipping_form.city.value|default:'' }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">District</label>
+                                        <input type="text" name="state" class="form-control-custom" value="{{ shipping_form.state.value|default:'' }}" required>
+                                    </div>
+                                </div>
+
+                                <div class="row g-3 mb-5">
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Country</label>
+                                        <input type="text" name="country" class="form-control-custom" value="{{ shipping_form.country.value|default:'' }}" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label-custom">Zip Code</label>
+                                        <input type="text" name="zipcode" class="form-control-custom" value="{{ shipping_form.zipcode.value|default:'' }}" required>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-checkout">
+                                    Continue to Payment &rarr;
+                                </button>
 
                             </div>
                         </div>
+                    </div>
 
-                    </div> 
                 </div>
-
+            </form>
+        </div>
+    </div>
 {% endblock %}

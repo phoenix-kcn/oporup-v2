@@ -41,36 +41,37 @@ def billing_info(request):
         quantities = cart.get_quantities()
         totals = cart.cart_total()
 
-        # Create a session with Shipping Info
-        my_shipping = request.POST
-        request.session['my_shipping'] = my_shipping
+        # --- THE FIX STARTS HERE ---
+        # 1. Create a dictionary that maps the HTML input names to the Billing Template variable names
+        shipping_info = {
+            'shipping_full_name': request.POST.get('full_name'),
+            'shipping_email': request.POST.get('email'),
+            'shipping_address1': request.POST.get('address1'),
+            'shipping_address2': request.POST.get('address2'),
+            'shipping_city': request.POST.get('city'),
+            'shipping_state': request.POST.get('state'),
+            'shipping_country': request.POST.get('country'),
+            'shipping_zipcode': request.POST.get('zipcode'),
+        }
+
+        # 2. Save this MAPPED dictionary to the session 
+        # (Now 'my_shipping' in the session will also have the correct keys for the next step)
+        request.session['my_shipping'] = shipping_info
         
-        # Check to see if user is logged in 
-        if request.user.is_authenticated:
-            billing_form = PaymentForm()
-            return render(request, 'payment/billing_info.html', {
-                'cart_products': cart_products, 
-                'quantities': quantities, 
-                'totals': totals, 
-                'billing_form': billing_form,
-                'shipping_info': request.POST
-            })
-        else:
-            billing_form = PaymentForm()
-            return render(request, 'payment/billing_info.html', {
-                'cart_products': cart_products, 
-                'quantities': quantities, 
-                'totals': totals, 
-                'billing_form': billing_form,
-                'shipping_info': request.POST
-            })
-        # shipping_form = request.POST
-        # return render(request, 'payment/billing_info.html', {'cart_products': cart_products, 'quantities': quantities, 'totals': totals, 'shipping_form': shipping_form})
+        # 3. Pass 'shipping_info' (the dictionary we just made) to the context
+        billing_form = PaymentForm()
+        return render(request, 'payment/billing_info.html', {
+            'cart_products': cart_products, 
+            'quantities': quantities, 
+            'totals': totals, 
+            'billing_form': billing_form,
+            'shipping_info': shipping_info 
+        })
+        # --- THE FIX ENDS HERE ---
     
     else:
         messages.success(request, 'Access Denied')
         return redirect('home')
-    
     
 def process_order(request):
     if request.POST:

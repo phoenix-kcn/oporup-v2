@@ -96,106 +96,6 @@
 
 {% block content %}
 
-<!-- <div class="container my-5">
-    <div class="card p-3 shadow-sm border-0">
-        <div class="row">
-            <div class="col-md-5 mb-4 mb-md-0">
-                <div class="border d-flex justify-content-center align-items-center p-3 mb-2" style="height: 350px; background-color: #f8f8f8;">
-                    <img src="{{ product.image.url }}" class="img-fluid" alt="Screen Expander" style="max-height: 100%;">
-                </div>
-            </div>
-            
-            <div class="col-md-7">
-                <h1 class="fs-7 fw-normal mb-3">
-                    <b>{{ product.name }}</b>
-                </h1>
-
-                <div class="d-flex justify-content-between align-items-center border-bottom pb-2 mb-3">
-                    <div class="d-flex align-items-center">
-                        <span class="text-warning me-2">☆☆☆☆☆</span>
-                        <span class="text-muted small">No Ratings</span>
-                    </div>
-                    <div>
-                        <a href="#" class="text-secondary me-2 text-decoration-none">🔗</a> 
-                        <a href="#" class="text-secondary me-2 text-decoration-none">🤍</a>
-                    </div>
-                </div>
-
-                <p class="small mb-4">
-                    <span class="text-muted">Brand:</span> 
-                    <a href="#" class="text-primary fw-bold text-decoration-none">No Brand</a> | 
-                    <a href="#" class="text-primary text-decoration-none">More Video from No Brand</a>
-                </p>
-
-                <div class="mb-4">
-                    <p class="h2 fw-bold" style="color: #ff6819;">$ {{ product.price }}</p>
-                    <p>{{ product.description }}</p>
-                    {% if product.on_sale %}
-                    <p class="small text-muted mb-0">
-                        <span class="text-decoration-line-through">$ {{ product.original_price }}</span>
-                        <span class="text-danger ms-2">-{{ product.discount_percentage }}%</span>
-                    </p>
-                    {% endif %}
-                </div>
-                
-                <hr> <br><br>
-                
-                <div class="row align-items-center">
-                    <div class="col-auto">
-                        <p class="mb-0">Quantity</p>
-                    </div>
-
-                    <div class="col-md-2">
-                        <select class="form-select" id="qty-cart">
-                            <option value="1" selected>1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="5">6</option>
-                            <option value="5">7</option>
-                            <option value="5">8</option>
-                            <option value="5">9</option>
-                            <option value="5">10</option>
-                        </select>
-                    </div>
-
-                    <div class="col-auto">
-                        <button type="button" value="{{ product.id }}" class="btn text-white fw-bold" id="add-to-cart" style="background-color: #ff6819;">
-                            Add to Cart
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    $(document).on('click','#add-to-cart',function(e){
-        e.preventDefault();
-        $.ajax({
-            type: 'POST',
-            url: "{% url 'cart_add' %}",
-            data: {
-                product_id: $('#add-to-cart').val(),
-                product_qty: $('#qty-cart option:selected').text(),
-                csrfmiddlewaretoken: '{{ csrf_token }}',
-                action: 'post',
-            },
-            success: function(json){
-                // console.log(json);
-                document.getElementById('cart_quantity').textContent = json.qty;
-                location.reload();
-            },
-
-            error: function(xhr, errmsg, err){
-                console.log(xhr.status + ": " + xhr.responseText);
-            }
-        })
-    });
-</script> -->
-
 
 <div class="container my-5">
     
@@ -243,9 +143,9 @@
 
                 <div class="mb-4">
                     <div class="d-flex align-items-end gap-3">
-                        <span class="h2 fw-bold mb-0 text-dark">$ {{ product.price }}</span>
+                        <span class="h2 fw-bold mb-0 text-dark">{{ product.price }} tk</span>
                         {% if product.on_sale %}
-                            <span class="text-muted text-decoration-line-through mb-1">$ {{ product.original_price }}</span>
+                            <span class="text-muted text-decoration-line-through mb-1">{{ product.original_price }} tk</span>
                         {% endif %}
                     </div>
                     <p class="text-muted small mt-1">Tax included. Shipping calculated at checkout.</p>

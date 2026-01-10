@@ -211,10 +211,10 @@
 
                     <div class="col-6 col-md-2 mt-3 mt-md-0 text-end">
                         {% if product.on_sale %}
-                            <div class="old-price">${{ product.price }}</div>
-                            <div class="price-tag">${{ product.sale_price }}</div>
+                            <div class="old-price">{{ product.price }} tk</div>
+                            <div class="price-tag">{{ product.sale_price }} tk</div>
                         {% else %}
-                            <div class="price-tag">${{ product.price }}</div>
+                            <div class="price-tag">{{ product.price }} tk</div>
                         {% endif %}
                     </div>
                 </div>
@@ -234,7 +234,7 @@
                 
                 <div class="summary-row">
                     <span>Subtotal</span>
-                    <span>${{ totals }}</span>
+                    <span>{{ totals }} tk</span>
                 </div>
                 <div class="summary-row">
                     <span>Shipping</span>
@@ -242,12 +242,12 @@
                 </div>
                 <div class="summary-row">
                     <span>Tax (Estimated)</span>
-                    <span>$0.00</span>
+                    <span>0.00 tk</span>
                 </div>
 
                 <div class="summary-total">
                     <span>Total</span>
-                    <span>${{ totals }}</span>
+                    <span>{{ totals }} tk</span>
                 </div>
 
                 <a href="{% url 'checkout' %}" class="btn btn-checkout mt-4 shadow-sm">

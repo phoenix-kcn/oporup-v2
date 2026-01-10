@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Payment Cancelled{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            
+            <div class="card shadow-lg border-0 rounded-3 mt-4">
+                <div class="card-body p-5 text-center">
+                    
+                    <div class="mb-4">
+                        <div style="width: 80px; height: 80px; background-color: #f8d7da; color: #dc3545; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                                <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <h1 class="h2 fw-bold text-danger mb-3">Payment Cancelled</h1>
+                    <p class="text-muted mb-4">
+                        We couldn't process your payment. This might be due to a network issue, insufficient funds, or a cancelled transaction.
+                    </p>
+
+                    {% if message %}
+                    <div class="alert alert-danger d-inline-block text-start" role="alert">
+                        <small><strong>Error:</strong> {{ message }}</small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+                        <a href="{% url 'checkout' %}" class="btn btn-danger px-4">Try Again</a>
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary px-4">Return Home</a>
+                    </div>
+
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center pb-4">
+                    <small class="text-muted">Need help? <a href="#" class="text-decoration-none">Contact Support</a></small>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+

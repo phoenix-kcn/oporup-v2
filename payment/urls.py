@@ -10,4 +10,5 @@ urlpatterns = [
     path('process_order', views.process_order, name='process_order'),
     path('payment_success_callback/', views.payment_success_callback, name='payment_success_callback'),
     path('payment_fail/', views.payment_fail, name='payment_fail'),
+    path('payment_cancel/', views.payment_cancel, name='payment_cancel'),
 ] 

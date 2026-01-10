@@ -213,6 +213,10 @@ def payment_success_callback(request):
 def payment_fail(request):
     return render(request, 'payment/payment_fail.html')
 
+@csrf_exempt
+def payment_cancel(request):
+    return render(request, 'payment/payment_cancel.html')
+
 def shipped_dash(request):
     if request.user.is_authenticated and request.user.is_superuser:
         orders = Order.objects.filter(shipped=True)

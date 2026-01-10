@@ -1,106 +1,260 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Billing-Info{% endblock %}
+{% block title %}Billing Info{% endblock %}
+
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+    /* Custom Minimal Styles */
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa; /* Light gray background */
+    }
+    
+    /* Hide the main navbar if your base.html has a specific class for it, 
+       otherwise, this header acts as the sole branding */
+    .checkout-header {
+        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        transition: transform 0.2s;
+    }
+
+    .card-header {
+        background-color: transparent;
+        border-bottom: 1px solid #f0f0f0;
+        font-weight: 600;
+        padding: 1.5rem;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+    }
+
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    /* Product List Styling */
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #f9f9f9;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .product-meta {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    /* Shipping Field Styling */
+    .shipping-row {
+        margin-bottom: 0.8rem;
+        display: flex;
+        align-items: baseline;
+    }
+    .shipping-label {
+        width: 100px;
+        font-size: 0.85rem;
+        color: #8898aa;
+        font-weight: 500;
+        flex-shrink: 0;
+    }
+    .shipping-value {
+        font-size: 0.95rem;
+        color: #333;
+        font-weight: 500;
+    }
+
+    /* Button Styling */
+    .btn-primary-custom {
+        background-color: #10b981; /* Modern Green */
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    .btn-primary-custom:hover {
+        background-color: #059669;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-outline-custom {
+        color: #6c757d;
+        border: 1px solid #dee2e6;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        padding: 5px 12px;
+    }
+    .btn-outline-custom:hover {
+        background-color: #f8f9fa;
+        color: #333;
+    }
+
+    .total-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a1a;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-
-        <header class="bg-dark py-5">
-    <div class="container px-4 px-lg-5 my-5">
-        <div class="text-center text-white">
-            <h1 class="display-4 fw-bolder">Billing Info</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Review your order and proceed to payment...</p>
-        </div>
+<div class="checkout-header py-4 mb-5">
+    <div class="container text-center">
+        <h2 class="fw-bold mb-1">Billing Info</h2>
+        <p class="text-muted mb-0">Review your order and proceed to payment</p>
     </div>
-</header>
+</div>
 
-<div class="container my-5">
-    <div class="row g-4"> 
-
-        <div class="col-md-5">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    Order Summary
+<div class="container mb-5">
+    <div class="row g-5"> 
+        
+        <div class="col-lg-5 order-lg-1">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Order Summary</span>
+                    <span class="badge bg-light text-dark rounded-pill">{{ cart_products|length }} Items</span>
                 </div>
                 <div class="card-body">
                     {% for product in cart_products %}
-                        <div class="mb-2">
-                            <strong>{{ product.name }}</strong>
-                            <br>
-                            Price: 
-                            {% if product.on_sale %}
-                                ${{ product.sale_price }}
-                            {% else %}
-                                ${{ product.price }}
-                            {% endif %}
-                            <br>
-                            <span>Quantity: </span>
-                            {% for key, value in quantities.items %}
-                                {% if key == product.id|slugify %}
-                                    {{ value }}
+                        <div class="product-item">
+                            <div>
+                                <div class="product-name">{{ product.name }}</div>
+                                <div class="product-meta mt-1">
+                                    Price: 
+                                    {% if product.on_sale %}
+                                        ${{ product.sale_price }}
+                                    {% else %}
+                                        ${{ product.price }}
+                                    {% endif %}
+                                    &nbsp;|&nbsp;
+                                    Qty: 
+                                    {% for key, value in quantities.items %}
+                                        {% if key == product.id|slugify %}
+                                            {{ value }}
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="fw-bold">
+                                {% if product.on_sale %}
+                                    ${{ product.sale_price }}
+                                {% else %}
+                                    ${{ product.price }}
                                 {% endif %}
-                            {% endfor %}
+                            </div>
                         </div>
-                        <hr>
                     {% empty %}
-                        <p>Your cart is empty.</p>
+                        <p class="text-center text-muted my-4">Your cart is empty.</p>
                     {% endfor %}
 
-                    <div class="d-flex justify-content-between align-items-center pt-2">
-                        <a href="{% url 'cart_summary' %}" class="btn btn-outline-secondary btn-sm">
-                            &larr; Edit Cart
-                        </a>
-                        <div class="text-end">
-                            <strong class="h5">Total: ${{ totals }}</strong>
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <span class="text-muted">Total Amount</span>
+                            <span class="total-amount">${{ totals }}</span>
                         </div>
+                        
+                        <a href="{% url 'cart_summary' %}" class="btn btn-outline-custom w-100">
+                            <i class="fas fa-shopping-cart me-2"></i> Edit Cart
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-7">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    Shipping Info
+        <div class="col-lg-7 order-lg-2">
+            
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="fas fa-map-marker-alt me-2 text-muted"></i>Shipping Details</span>
+                    <a href="{% url 'checkout' %}" class="text-decoration-none small fw-bold text-primary">Edit</a>
                 </div>
                 <div class="card-body">
-                    Name: {{ shipping_info.shipping_full_name }} <br>
-                    Email: {{ shipping_info.shipping_email }} <br>
-                    Address: {{ shipping_info.shipping_address1 }} {{ shipping_info.shipping_address2 }} <br>
-                    City: {{ shipping_info.shipping_city }} <br>
-                    State: {{ shipping_info.shipping_state }} <br>
-                    Country: {{ shipping_info.shipping_country }} <br>
-                    Zipcode: {{ shipping_info.shipping_zipcode }} <br>
-
-                    <div class="d-flex justify-content-between align-items-center pt-2">
-                        <a href="{% url 'checkout' %}" class="btn btn-outline-secondary btn-sm">
-                            Update Shipping
-                        </a>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="shipping-row">
+                                <span class="shipping-label">Name</span>
+                                <span class="shipping-value text-uppercase">{{ shipping_info.shipping_full_name }}</span>
+                            </div>
+                            <div class="shipping-row">
+                                <span class="shipping-label">Email</span>
+                                <span class="shipping-value">{{ shipping_info.shipping_email }}</span>
+                            </div>
+                            <div class="shipping-row">
+                                <span class="shipping-label">Phone</span>
+                                <span class="shipping-value">--</span> </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="shipping-row">
+                                <span class="shipping-label">Address</span>
+                                <span class="shipping-value">
+                                    {{ shipping_info.shipping_address1 }}
+                                    {% if shipping_info.shipping_address2 %}, {{ shipping_info.shipping_address2 }}{% endif %}
+                                </span>
+                            </div>
+                            <div class="shipping-row">
+                                <span class="shipping-label">City</span>
+                                <span class="shipping-value">{{ shipping_info.shipping_city }}, {{ shipping_info.shipping_state }}</span>
+                            </div>
+                            <div class="shipping-row">
+                                <span class="shipping-label">Zip/Country</span>
+                                <span class="shipping-value">{{ shipping_info.shipping_zipcode }}, {{ shipping_info.shipping_country }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="mt-5">
-                <form action="{% url 'process_order' %}" method="POST">
-                    {% csrf_token %} 
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-dark text-white">
-                            Payment Method
-                        </div>
-                        <div class="card-body">
-                            <p>You will be redirected to <strong>SSLCommerz</strong> to complete your payment securely.</p>
+            <form action="{% url 'process_order' %}" method="POST">
+                {% csrf_token %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <i class="fas fa-lock me-2 text-muted"></i>Payment Method
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-light border d-flex align-items-center" role="alert">
+                            <i class="fas fa-shield-alt text-success fs-3 me-3"></i>
+                            <div>
+                                <h6 class="alert-heading mb-1 fw-bold">Secure Redirect</h6>
+                                <p class="mb-0 small text-muted">You will be redirected to <strong>SSLCommerz</strong> to complete your payment securely.</p>
                             </div>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="text-end mt-3"> 
-                        <button type="submit" class="btn btn-success">
-                            Proceed to Pay ${{ totals }} &rarr;
-                        </button>
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary-custom shadow">
+                        Proceed to Pay ${{ totals }} <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                    <div class="mt-2 text-muted small">
+                        <i class="fas fa-lock me-1"></i> Your transaction is secured with SSL encryption
                     </div>
-                </form>
-            </div>
+                </div>
+            </form>
+
         </div>
-        
-    </div> 
+    </div>
 </div>
 
 {% endblock %}

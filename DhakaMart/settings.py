@@ -140,6 +140,7 @@ AWS_S3_REGION_NAME = 'ap-southeast-2'
 AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL =  None
 AWS_S3_VERIFY = True
+AWS_QUERYSTRING_AUTH = False
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -149,14 +150,15 @@ STORAGES = {
     },
 }
 
+# 2. Use the Custom Domain (Uncomment this!)
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
-# --- AWS S3 SETTINGS ---
-# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+# 3. ACL None is fine, provided you do the AWS Console step below
+AWS_DEFAULT_ACL = None 
 
-# This tells Django: "When you want to show an image, look at this URL"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# 2. Update MEDIA_URL to standard format (or just remove it, django-storages handles it)
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+# 4. REMOVE the manual MEDIA_URL line you added previously.
+# Let django-storages handle it using the CUSTOM_DOMAIN setting above.
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 
 # Replace these with your actual Store ID and Password

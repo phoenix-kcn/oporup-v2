@@ -11,3 +11,4 @@ staticfiles/
 *.pot
 *.mo
 node_modules/
+.env

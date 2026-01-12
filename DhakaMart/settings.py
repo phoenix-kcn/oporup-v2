@@ -18,7 +18,7 @@ SECRET_KEY = 'django-insecure-=x#*clf#7^2eq5w*z_f3f=eder#sx@6@ed9g0&iulvh^xyh+1w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['13.211.11.123']
+ALLOWED_HOSTS = ['3.107.205.117', 'localhost', 'oporup-v2-bucket.s3.ap-southeast-2.amazonaws.com']
 
 
 # Application definition

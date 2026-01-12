@@ -18,8 +18,6 @@ SECRET_KEY = 'django-insecure-=x#*clf#7^2eq5w*z_f3f=eder#sx@6@ed9g0&iulvh^xyh+1w
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['3.107.205.117', 'localhost', 'oporup-v2-bucket.s3.ap-southeast-2.amazonaws.com']
-
 
 # Application definition
 
@@ -132,15 +130,22 @@ MEDIA_URL = 'media/'
 
 
 
+# AWS SETTINGS
 AWS_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY')
 AWS_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = 'oporup-v2-bucket'
-AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_REGION_NAME = 'ap-southeast-2'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL =  None
-AWS_S3_VERIFY = True
+
+# 1. This keeps uploaded files "Private" by default, but the Bucket Policy makes them readable.
+AWS_DEFAULT_ACL = None 
+
+# 2. This creates clean URLs (e.g., https://bucket.../image.jpg) without valid signatures
 AWS_QUERYSTRING_AUTH = False
+AWS_S3_VERIFY = True
+
+# 3. Configure Storages
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -150,15 +155,14 @@ STORAGES = {
     },
 }
 
-# 2. Use the Custom Domain (Uncomment this!)
+# 4. Custom Domain for Public Links
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-
-# 3. ACL None is fine, provided you do the AWS Console step below
-AWS_DEFAULT_ACL = None 
-
-# 4. REMOVE the manual MEDIA_URL line you added previously.
-# Let django-storages handle it using the CUSTOM_DOMAIN setting above.
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+
+# Note: You can remove 'oporup-v2-bucket...' from ALLOWED_HOSTS. 
+# It belongs in AWS_S3_CUSTOM_DOMAIN, not ALLOWED_HOSTS.
+ALLOWED_HOSTS = ['3.107.205.117', 'localhost', '127.0.0.1']
 
 
 # Replace these with your actual Store ID and Password

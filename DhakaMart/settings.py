@@ -151,11 +151,12 @@ STORAGES = {
 
 
 # --- AWS S3 SETTINGS ---
-AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
 # This tells Django: "When you want to show an image, look at this URL"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+# 2. Update MEDIA_URL to standard format (or just remove it, django-storages handles it)
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
 
 
 # Replace these with your actual Store ID and Password

@@ -81,7 +81,7 @@ DATABASES = {
         'NAME': 'oporup',
         'USER': 'kcn',
         'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': 'dhakamart-backend.c3iy8gmuk4zm.ap-southeast-2.rds.amazonaws.com',
+        'HOST': 'database-2.c3iy8gmuk4zm.ap-southeast-2.rds.amazonaws.com',
         'PORT': '5432',
     }
 }

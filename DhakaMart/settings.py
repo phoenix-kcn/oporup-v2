@@ -34,13 +34,13 @@ INSTALLED_APPS = [
     'cart',    
     'payment',
     'imagekit', # For image processing
-    # 'whitenoise.runserver_nostatic',
+    'whitenoise.runserver_nostatic',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -124,7 +124,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATICFILES_DIRS = ['static/']
 # Add this line:
-# STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = 'media/'
 # Keep this defined to prevent the AttributeError
@@ -132,30 +132,30 @@ MEDIA_URL = 'media/'
 
 
 
-# AWS_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY')
-# AWS_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY')
-# AWS_STORAGE_BUCKET_NAME = 'dhakamart-backend'
-# AWS_S3_SIGNATURE_VERSION = 's3v4'
-# AWS_S3_REGION_NAME = 'ap-southeast-2'
-# AWS_S3_FILE_OVERWRITE = False
-# AWS_DEFAULT_ACL =  None
-# AWS_S3_VERIFY = True
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-#     },
-# }
+AWS_ACCESS_KEY_ID = os.environ.get('S3_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY = os.environ.get('S3_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = 'oporup-v2-bucket'
+AWS_S3_SIGNATURE_VERSION = 's3v4'
+AWS_S3_REGION_NAME = 'ap-southeast-2'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  None
+AWS_S3_VERIFY = True
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 
 
 # --- AWS S3 SETTINGS ---
-# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
 # This tells Django: "When you want to show an image, look at this URL"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 
 # Replace these with your actual Store ID and Password

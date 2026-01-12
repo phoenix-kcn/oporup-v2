@@ -5,35 +5,52 @@ from django.db.models.signals import post_save
 from imagekit.models import ImageSpecField 
 from imagekit.processors import ResizeToFill
 from PIL import Image
+from django.core.files.base import ContentFile
+import os
+from io import BytesIO
 
-
-# Category Model
-class  Category(models.Model):
+class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     icon_img = models.ImageField(upload_to='uploads/category_icons/', blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        # 1. Save the instance first so the file is created on the filesystem
-        super().save(*args, **kwargs)
-
-        # 2. Open the image if it exists
-        if self.icon_img:
-            img_path = self.icon_img.path
-
+        # 1. Detect if the image has changed
+        is_new_image = False
+        
+        if self.pk:
             try:
-                img = Image.open(img_path)
+                old_obj = Category.objects.get(pk=self.pk)
+                # Compare the new image object against the old one
+                if old_obj.icon_img != self.icon_img:
+                    is_new_image = True
+            except Category.DoesNotExist:
+                pass # Object is new, so it doesn't exist in DB yet
+        else:
+            # No primary key means this is a new object
+            is_new_image = True
 
-                # 3. Define the maximum size (e.g., 100x100 pixels for an icon)
-                output_size = (320, 460)
+        # 2. Only resize if there is an image AND it is new
+        if self.icon_img and is_new_image:
+            img = Image.open(self.icon_img)
 
-                # 4. Resize if the image is larger than the output size
-                if img.height > 320 or img.width > 460:
-                    img.thumbnail(output_size)
-                    img.save(img_path) # Overwrite the file with the smaller version
-            except Exception as e:
-                # Handle cases where the file might not be a valid image
-                print(f"Error resizing image: {e}")
+            if img.height > 320 or img.width > 460:
+                output_size = (460, 320)
+                img.thumbnail(output_size)
+
+                buffer = BytesIO()
+                # Maintain original format or fallback to JPEG
+                img_format = img.format if img.format else 'JPEG'
+                img.save(buffer, format=img_format)
+
+                # 3. Use os.path.basename to get just the filename (fixes path duplication bugs)
+                file_name = os.path.basename(self.icon_img.name)
+                
+                # Save the new resized file
+                self.icon_img.save(file_name, ContentFile(buffer.getvalue()), save=False)
+
+        # 4. Call the parent save method
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

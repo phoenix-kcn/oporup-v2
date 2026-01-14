@@ -161,8 +161,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 # Note: You can remove 'oporup-v2-bucket...' from ALLOWED_HOSTS. 
-# It belongs in AWS_S3_CUSTOM_DOMAIN, not ALLOWED_HOSTS.
-ALLOWED_HOSTS = ['3.107.205.117', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['3.107.205.117', '127.0.0.1']
 
 
 # Replace these with your actual Store ID and Password
